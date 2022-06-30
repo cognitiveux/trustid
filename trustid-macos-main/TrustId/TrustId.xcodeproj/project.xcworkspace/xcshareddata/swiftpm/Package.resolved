@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "JWTDecode",
+        "repositoryURL": "https://github.com/auth0/JWTDecode.swift.git",
+        "state": {
+          "branch": null,
+          "revision": "3cd207fb9e943b6168a117baa3936c823204c2dc",
+          "version": "2.6.3"
+        }
+      },
+      {
+        "package": "SwiftPublicIP",
+        "repositoryURL": "https://github.com/HackingGate/Swift-Public-IP",
+        "state": {
+          "branch": null,
+          "revision": "20765a3eb03d3800df93b6fd13bf55c9ac8c8278",
+          "version": "0.0.2"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
