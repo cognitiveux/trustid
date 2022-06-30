@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="generator" content="">
+    <title>TRUSTID - Fase 1 - Criação de Modelos Computacionais para Identificação do Utilizador </title>
+    <link href="enroll-assets/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="enroll-css/main.css" rel="stylesheet">
+    <style>
+      .customloader {
+          border: 5px solid #f3f3f3;
+          -webkit-animation: spin 1s linear infinite;
+          animation: spin 1s linear infinite;
+          border-top: 5px solid #3498db;
+          border-radius: 50%;
+          width: 50px;
+          height: 50px;
+       }
+
+      /* Safari */
+      @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      </style>
+  </head>
+  <body class="bg-light">
+
+<div class="container">
+  <main>
+    <div class="py-5 text-center">
+      <img class="d-block mx-auto mb-4" src="enroll-img/logo.png" alt="" width="72" height="72">
+      <h2>TRUSTID - Primeiro Estudo de Avaliação (Prova de Conceito)</h2>
+      <p class="lead">Fase 1 - Criação de Modelos Computacionais para Identificação do Utilizador</p>
+    </div>
+
+    <div class="row g-5">
+      <div class="col-md-5 col-lg-4 order-md-last">
+        <h4 class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-primary">Progresso</span>
+        </h4>
+        <ul class="list-group mb-3">
+          <li id="liStep1" class="list-group-item d-flex justify-content-between bg-light">
+            <div>
+              <h6 class="my-0">Indique o seu endereço de email</h6>
+              <small>Passo 1</small>
+            </div>
+            <span style="margin-left:5px;"></span>
+          </li>
+          <li id="liStep2" class="list-group-item d-flex justify-content-between">
+            <div>
+              <h6 id="divHeadingStep2" class="my-0" style="color: #aaaaaa">Verificação da câmara</h6>
+              <small id="divSmallStep2" style="color: #aaaaaa">Passo 2</small>
+            </div>
+            <span style="margin-left:5px;"></span>
+          </li>
+          <li id="liStep3" class="list-group-item d-flex justify-content-between">
+            <div id="divLiStep3">
+              <h6 id="divHeadingStep3" class="my-0" style="color: #aaaaaa">Gravação de dados biometricos</h6>
+              <small id="divSmallStep3" style="color: #aaaaaa">Passo 3</small>
+            </div>
+            <span style="margin-left:5px;"></span>
+          </li>
+        </ul>
+
+        <h4 class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-primary">A sua câmara</span>
+        </h4>
+        <ul class="list-group mb-3">
+          <li class="list-group-item d-flex justify-content-between">
+            <div>
+              <h6 id="lblCameraStatus" class="my-0">A sua câmara está desligada</h6><br />
+              <video id="video" width="250" height="150" poster="enroll-img/thumb.png"></video>
+              <br />
+              <canvas id="canvas" width="640" height="480" style="display: none"></canvas>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="col-md-7 col-lg-8">
+        <div id="lblAlert" class="alert" role="alert" style="display: none;">Mensagem de alerta</div>
+        <div id="divStep1">
+          <h4 class="mb-3">Passo 1: Indique o seu endereço de email</h4>
+          <div class="row g-3">
+            <div class="col-12">
+              <label for="email" class="form-label">Email (utilize o mesmo email que usou na inscrição no estudo)</label>
+              <input type="email" class="form-control" id="txtEmail" placeholder="you@example.com" value="">
+            </div>
+          </div>
+          <br />
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="chkPrivacy">
+            <label class="form-check-label" for="chkPrivacy">Eu concordo com o processamento dos meus dados pessoais de acordo com a <a href="https://www.trustid-project.eu/privacy.php" target="_blank">política de privacidade</a></label>
+          </div>
+          <hr class="my-4">
+          <button id="btnCompleteStep1" class="w-100 btn btn-primary btn-lg" type="button">Continuar</button>
+        </div>
+        <div id="divStep2" style="display: none;">
+          <h4 class="mb-3">Passo 2: Verificação da câmara</h4>
+          <div class="row g-3">
+            <div class="col-12">
+              <p>Neste passo, iremos pedir-lhe para ligar a sua câmara e o sistema TRUSTID irá efetuar algumas verificações para garantir a qualidade da imagem.
+                Para já, a gravação vídeo ainda não começou. A gravação irá iniciar quando você sentir-se confortável com o sistema e pretender dar início à gravação no passo 3.
+              </p>
+              <label id="lblListOfCameras" for="ListOfCameras">Escolha a sua câmara:</label>
+              <select id="ListOfCameras" class="form-select" aria-label="Camera select">
+                <option id="-1" value="-1">Nenhuma câmara selecionada</option>
+              </select>
+              <br />
+              <button id="btnGetCameras" class="btn btn-primary">Encontrar câmaras disponíveis</button>
+              <button id="btnStartCamera" class="btn btn-primary">Iniciar câmara</button>
+              <button id="btnStopCamera" class="btn btn-primary">Desligar câmara</button>
+            </div>
+          </div>
+          <hr class="my-4">
+          <button id="btnCompleteStep2" class="w-100 btn btn-primary btn-lg" type="button" style="display: none">Continuar</button>
+        </div>
+        <div id="divStep3" style="display:none;">
+          <h4 class="mb-3">Passo 3: Gravação dos dados biométricos</h4>
+          <div class="row g-3">
+            <div class="col-12">
+              <img id="imgFaceAnimation" src="enroll-img/left.gif" style="float: right; display: none;"/>
+              <p>Primeiro, posicione de modo a ter a sua câra dentro da imagem da câmara a uma distância em que se sinta confortável. Em seguida, irá passar por 5 etapas onde iremos pedir-lhe que vire a sua cara em multiplas direções - para a <strong>esquerda</strong> (ou seja, a bochecha direita virada para a câmara), para a <strong>direita</strong> (bochecha esquerda virada para a câmara), em <strong>frente</strong>, para <strong>cima</strong>, e para <strong>baixo</strong>.</p>
+              <p>Para cada posição diferente, clique no botão correspondente e imite os movimentos como indicado na animação que irá ser-lhe apresentada.</p>
+              <button id="btnGetStarted" class="w-100 btn btn-primary btn-lg" type="button">Iniciar o processo</button>
+              <div id="divBtnPoses" style="display: none;">
+                  <button id="btnStartRecordingLeft" class="btn btn-primary">Face virada para a esquerda</button>
+                  <button id="btnStartRecordingRight" class="btn btn-secondary" style="display: none;" disabled>Face virada para a direita</button>
+                  <button id="btnStartRecordingForward" class="btn btn-secondary" style="display: none;" disabled>Face virada para cima</button>
+                  <button id="btnStartRecordingUpward" class="btn btn-secondary" style="display: none;" disabled>Face virada para cima</button>
+                  <button id="btnStartRecordingDownward" class="btn btn-secondary" style="display: none;" disabled>Face virada para baixo</button>
+              </div>
+              <div class="customloader" style="display: none; margin: auto; margin-top: 30px;"></div>
+              <div id="waitImgUpload" style="display: none; margin-top: 10px; text-align: center;">A processar os dados biométicos em segurança.<br />
+                Imite continuamente a animação até receber um sinal da página.<br />Cada gravação para cada pose diferente demora 60 segundos.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="divStep4" style="display:none;">
+          <h4 class="mb-3">Obrigado por participar na primeira fase do estudo TRUSTID.</h4>
+          <div class="row g-3">
+            <div class="col-12">
+              <p>
+                Os seus dados foram processados e guardados com sucesso. Irá receber um email nos próximos dias para visitar a mesma página e repetir os mesmos passos que efetuou agora.
+              </p>
+              <p>Your data will be confidential and processed and stored securely during the course of the project. At the end of the project, all data will be permanently deleted from the project’s database. Only researchers of the project will have access to the data, which will be used for research purposes only. </p>
+              <p>Os seus dados estão confidenciais, processados e guardados em segurança apenas durante o decorrer o projeto. No fim do projeto, todos os dados serão permanentemente apagados da base de dados do projeto. Apenas os investigadores do projeto terão acesso aos dados, que serão utilizados apenas para o desenvolvimento do sistema.</p>
+              <p>Caso queria remover os seus dados, pode a qualquer momento enviar um email para <a href="mailto:unscubscribe_poc1@trustid-project.eu">unscubscribe_poc1@trustid-project.eu</a> usando o mesmo email que utilizou para subscrever ao estudo e todos os seus dados serão apagados da base de dados do projeto. </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="my-5 pt-5 text-muted text-center text-small">
+    <p class="mb-1">&copy; 2021-2023 TRUSTID</p>
+    <ul class="list-inline">
+      <li class="list-inline-item"><a href="https://www.trustid-project.eu/privacy.php" target="_blank">Política de Privacidade</a></li>
+    </ul>
+  </footer>
+</div>
+
+    <script src="enroll-js/jquery-3.6.0.min.js"></script>
+    <script src="enroll-assets/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      $(document).ready(function(){
+
+        function preLoadAnimationImgs() {
+          var imgLeft = new Image();
+          imgLeft.onload = function () {
+              console.log("Left img loaded");
+          }
+          imgLeft.src = "enroll-img/left.gif";
+
+          var imgRight = new Image();
+          imgRight.onload = function () {
+              console.log("Right img loaded");
+          }
+          imgRight.src = "enroll-img/right.gif";
+
+          var imgForward = new Image();
+          imgForward.onload = function () {
+              console.log("Forward img loaded");
+          }
+          imgForward.src = "enroll-img/front.gif";
+
+          var imgUpward = new Image();
+          imgUpward.onload = function () {
+              console.log("Upward img loaded");
+          }
+          imgUpward.src = "enroll-img/up.gif";
+
+          var imgDownward = new Image();
+          imgDownward.onload = function () {
+              console.log("Downward img loaded");
+          }
+          imgDownward.src = "enroll-img/down.gif";
+        }
+
+        preLoadAnimationImgs();
+
+        $("#btnStartCamera").prop('disabled', true);
+        $("#btnStopCamera").prop('disabled', true);
+        var oSteps = 1;
+        var oEmail = "";
+
+        var counterLeftPose = 0;
+        var counterRightPose = 0;
+        var counterForwardPose = 0;
+        var counterUpwardPose = 0;
+        var counterDownwardPose = 0;
+        var stopShowLeft = false;
+        var stopShowRight = false;
+        var stopShowForward = false;
+        var stopShowUpward = false;
+        var stopShowDownward = false;
+
+        $("#btnGetStarted").click(function(){
+            $("#imgFaceAnimation").css("display", "block");
+            $("#divBtnPoses").css("display", "block");
+            $("#btnGetStarted").css("display", "none");
+        });
+
+        $("#btnCompleteStep1").click(function(){
+          oEmail = $("#txtEmail").val();
+          oIsPrivacyChecked = $("#chkPrivacy").is(":checked");
+          DisableButton($("#btnCompleteStep1"));
+          setTimeout(function() {
+            EnableButton($("#btnCompleteStep1"), "Continuar");
+            if(oEmail.length > 0 && oIsPrivacyChecked){
+              $("#divStep1").slideUp(500);
+              $("#divStep2").slideDown(500);
+              $("#liStep1").removeClass("bg-light");
+              $("#liStep1").children("*").css("color", "#006400");
+              $("#liStep1").children().last().html("OK");
+              $("#divHeadingStep2").css("color", "#000000");
+              $("#divSmallStep2").css("color", "#000000");
+              oSteps++;
+              CleanAlert();
+            }
+            else {
+              if(oEmail.length <= 0) // or does not exist in the DB
+                AlertMessage(4, "Por favor indique um email valido.");
+              else if (!oIsPrivacyChecked)
+                AlertMessage(4, "Você tem de aceitar a política de privacidade antes de iniciar o estudo.");
+            }
+          }, 1000);
+        });
+
+        $("#btnCompleteStep2").click(function(){
+          CleanAlert();
+          DisableButton($("#btnCompleteStep2"));
+
+          canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+          let image_data_url = canvas.toDataURL();
+          const base64Canvas = image_data_url.split(';base64,')[1];
+
+          setTimeout(function() {
+            $.ajax({
+              url: 'https://api.trustid-project.eu/backend/detect_low_contrast/',
+              dataType: 'json',
+              type: 'post',
+              contentType: 'application/json',
+              data: JSON.stringify( { "image": base64Canvas } ),
+              processData: false,
+              success: function( data, textStatus, xhr){
+                  if (xhr.status == 200) {
+                    if (data.resource_bool == false) {
+                        $("#divStep2").slideUp(500);
+                        $("#divStep3").slideDown(500);
+                        $("#liStep2").removeClass("bg-light");
+                        $("#liStep2").children("*").css("color", "#006400");
+                        $("#liStep2").children().last().html("OK");
+                        $("#liStep3").addClass("bg-light");
+                        $("#divHeadingStep2").css("color", "#006400");
+                        $("#divSmallStep2").css("color", "#006400");
+                        $("#divHeadingStep3").css("color", "#000000");
+                        $("#divSmallStep3").css("color", "#000000");
+                        oSteps++;
+                        CleanAlert();
+                    }
+                    else {
+                      AlertMessage(3, data.extra_details);
+                      EnableButton($("#btnCompleteStep2"), "Continuar");
+                      return false;
+                    }
+                  }
+                  else {
+                    AlertMessage(4, "Não foi possível verificar a qualidade da imagem da câmara. Por favor, tente outra vez.");
+                    EnableButton($("#btnCompleteStep2"), "Continuar");
+                    return false;
+                  }
+              },
+              error: function( jqXhr, textStatus, errorThrown ){
+                  AlertMessage(4, "Não foi possível comunicar com o servidor para efetuar a verificação da câmara. Por favor, tente outra vez.");
+                  EnableButton($("#btnCompleteStep2"), "Continuar");
+                  return false;
+              }
+            });
+          }, 1000);
+
+        });
+
+        $("#btnStartRecordingLeft").click(function() {
+            CleanAlert();
+            var uploadImgIntervalLeft = "";
+            uploadImgIntervalLeft = setInterval(uploadImgLeft, 500);
+
+            // Set a generic timeout so user can proceed to the next pose even if they experience issues in this head pose.
+            setTimeout(() => {
+                clearInterval(uploadImgIntervalLeft);
+
+                setTimeout(() => {
+                    AlertMessage(2, "Por favor proceda para a próxima etapa da recolha dos dados.");
+                    $("#divStep3").slideDown(500);
+                    $(".customloader").hide();
+                    $("#waitImgUpload").hide();
+                    $("#btnStartRecordingLeft").prop('disabled', true);
+                    $("#btnStartRecordingRight").prop('disabled', false);
+                    $("#btnStartRecordingRight").removeClass('btn-secondary');
+                    $("#btnStartRecordingRight").addClass('btn-primary');
+                    $("#btnStartRecordingLeft").removeClass('btn-primary');
+                    $("#btnStartRecordingLeft").addClass('btn-success');
+                    $("#imgFaceAnimation").attr("src", "enroll-img/right.gif");
+                    $("#btnStartRecordingRight").show();
+                    return false;
+                }, 20000);
+
+            }, 30000);
+
+            $("#btnStartRecordingLeft").prop('disabled', true);
+
+            $(".customloader").show();
+            $("#waitImgUpload").show();
+
+            function uploadImgLeft() {
+                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                let image_data_url = canvas.toDataURL();
+                const base64Canvas = image_data_url.split(';base64,')[1];
+
+                var currentPose = "LEFT_FACING";
+
+                fetch("save_img.php", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                  },
+                  body: `img_data=${base64Canvas}&email=${oEmail}&poseType=${currentPose}`,
+                })
+                .then(response => response.text())
+                .then(function(data) {
+                  var result = JSON.parse(data);
+
+                  if (result.code === 200 && result.msg === "OK") {
+                    counterLeftPose = counterLeftPose + 1;
+                  }
+
+                  if (counterLeftPose >= 10) {
+
+                    if (stopShowLeft === false) {
+                        stopShowLeft = true;
+                        clearInterval(uploadImgIntervalLeft);
+
+                    }
+
+                  }
+
+                })
+                .catch((error) => {
+                  AlertMessage(4, "A captura das imagens falhou. Por favor, refresque a página e tente repetir o processo novamente.");
+                  return false;
+                });
+            }
+
+        });
+
+        $("#btnStartRecordingRight").click(function() {
+            CleanAlert();
+            var uploadImgIntervalRight = "";
+            uploadImgIntervalRight = setInterval(uploadImgRight, 500);
+
+            // Set a generic timeout so user can proceed to the next pose even if they experience issues in this head pose.
+            setTimeout(() => {
+                clearInterval(uploadImgIntervalRight);
+
+                setTimeout(() => {
+                    AlertMessage(2, "Por favor proceda para a próxima etapa da recolha dos dados.");
+                    $("#divStep3").slideDown(500);
+                    $(".customloader").hide();
+                    $("#waitImgUpload").hide();
+                    $("#btnStartRecordingRight").prop('disabled', true);
+                    $("#btnStartRecordingForward").prop('disabled', false);
+                    $("#btnStartRecordingForward").removeClass('btn-secondary');
+                    $("#btnStartRecordingForward").addClass('btn-primary');
+                    $("#btnStartRecordingRight").removeClass('btn-primary');
+                    $("#btnStartRecordingRight").addClass('btn-success');
+                    $("#imgFaceAnimation").attr("src", "enroll-img/front.gif");
+                    $("#btnStartRecordingForward").show();
+                    return false;
+                }, 20000);
+
+            }, 30000);
+
+
+            $("#btnStartRecordingRight").prop('disabled', true);
+
+            $(".customloader").show();
+            $("#waitImgUpload").show();
+
+            function uploadImgRight() {
+                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                let image_data_url = canvas.toDataURL();
+                const base64Canvas = image_data_url.split(';base64,')[1];
+
+                var currentPose = "RIGHT_FACING";
+
+                fetch("save_img.php", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                  },
+                  body: `img_data=${base64Canvas}&email=${oEmail}&poseType=${currentPose}`,
+                })
+                .then(response => response.text())
+                .then(function(data) {
+                  var result = JSON.parse(data);
+
+                  if (result.code === 200 && result.msg === "OK") {
+                    counterRightPose = counterRightPose + 1;
+                  }
+
+                  if (counterRightPose >= 10) {
+
+                    if (stopShowRight === false) {
+                        stopShowRight = true;
+                        clearInterval(uploadImgIntervalRight);
+                    }
+                  }
+
+                })
+                .catch((error) => {
+                    AlertMessage(4, "A captura das imagens falhou. Por favor, refresque a página e tente repetir o processo novamente.");
+                  return false;
+                });
+            }
+
+
+        });
+
+        $("#btnStartRecordingForward").click(function() {
+            CleanAlert();
+            var uploadImgIntervalForward = "";
+            uploadImgIntervalForward = setInterval(uploadImgForward, 500);
+
+            // Set a generic timeout so user can proceed to the next pose even if they experience issues in this head pose.
+            setTimeout(() => {
+                clearInterval(uploadImgIntervalForward);
+
+                setTimeout(() => {
+                    AlertMessage(2, "Por favor proceda para a próxima etapa da recolha dos dados.");
+                    $("#divStep3").slideDown(500);
+                    $(".customloader").hide();
+                    $("#waitImgUpload").hide();
+                    $("#btnStartRecordingForward").prop('disabled', true);
+                    $("#btnStartRecordingUpward").prop('disabled', false);
+                    $("#btnStartRecordingUpward").removeClass('btn-secondary');
+                    $("#btnStartRecordingUpward").addClass('btn-primary');
+                    $("#btnStartRecordingForward").removeClass('btn-primary');
+                    $("#btnStartRecordingForward").addClass('btn-success');
+                    $("#imgFaceAnimation").attr("src", "enroll-img/up.gif");
+                    $("#btnStartRecordingUpward").show();
+                    return false;
+                }, 25000);
+
+            }, 35000);
+
+            $("#btnStartRecordingForward").prop('disabled', true);
+
+            $(".customloader").show();
+            $("#waitImgUpload").show();
+
+            function uploadImgForward() {
+                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                let image_data_url = canvas.toDataURL();
+                const base64Canvas = image_data_url.split(';base64,')[1];
+
+                var currentPose = "FORWARD_FACING";
+
+                fetch("save_img.php", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                  },
+                  body: `img_data=${base64Canvas}&email=${oEmail}&poseType=${currentPose}`,
+                })
+                .then(response => response.text())
+                .then(function(data) {
+                  var result = JSON.parse(data);
+
+                  if (result.code === 200 && result.msg === "OK") {
+                    counterForwardPose = counterForwardPose + 1;
+                  }
+
+
+                  if (counterForwardPose >= 15) {
+
+                    if (stopShowForward === false) {
+                        stopShowForward = true;
+                        clearInterval(uploadImgIntervalForward);
+                    }
+                  }
+
+                })
+                .catch((error) => {
+                  AlertMessage(4, "A captura das imagens falhou. Por favor, refresque a página e tente repetir o processo novamente.");
+                  return false;
+                });
+            }
+
+        });
+
+
+        $("#btnStartRecordingUpward").click(function() {
+            CleanAlert();
+            var uploadImgIntervalUpward = "";
+            uploadImgIntervalUpward = setInterval(uploadImgUpward, 500);
+
+            // Set a generic timeout so user can proceed to the next pose even if they experience issues in this head pose.
+            setTimeout(() => {
+                clearInterval(uploadImgIntervalUpward);
+
+                setTimeout(() => {
+                    AlertMessage(2, "Por favor proceda para a próxima etapa da recolha dos dados.");
+                    $("#divStep3").slideDown(500);
+                    $(".customloader").hide();
+                    $("#waitImgUpload").hide();
+                    $("#btnStartRecordingUpward").prop('disabled', true);
+                    $("#btnStartRecordingDownward").prop('disabled', false);
+                    $("#btnStartRecordingDownward").removeClass('btn-secondary');
+                    $("#btnStartRecordingDownward").addClass('btn-primary');
+                    $("#btnStartRecordingUpward").removeClass('btn-primary');
+                    $("#btnStartRecordingUpward").addClass('btn-success');
+                    $("#imgFaceAnimation").attr("src", "enroll-img/down.gif");
+                    $("#btnStartRecordingDownward").show();
+                    return false;
+                }, 20000);
+
+            }, 30000);
+
+
+            $("#btnStartRecordingUpward").prop('disabled', true);
+
+            $(".customloader").show();
+            $("#waitImgUpload").show();
+
+            function uploadImgUpward() {
+                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                let image_data_url = canvas.toDataURL();
+                const base64Canvas = image_data_url.split(';base64,')[1];
+
+                var currentPose = "UPWARD_FACING";
+
+                fetch("save_img.php", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                  },
+                  body: `img_data=${base64Canvas}&email=${oEmail}&poseType=${currentPose}`,
+                })
+                .then(response => response.text())
+                .then(function(data) {
+                  var result = JSON.parse(data);
+
+                  if (result.code === 200 && result.msg === "OK") {
+                    counterUpwardPose = counterUpwardPose + 1;
+                  }
+
+                  if (counterUpwardPose >= 10) {
+
+                    if (stopShowUpward === false) {
+                        stopShowUpward = true;
+                        clearInterval(uploadImgIntervalUpward);
+                    }
+                  }
+
+                })
+                .catch((error) => {
+                    AlertMessage(4, "A captura das imagens falhou. Por favor, refresque a página e tente repetir o processo novamente.");
+                  return false;
+                });
+            }
+
+        });
+
+        $("#btnStartRecordingDownward").click(function() {
+            CleanAlert();
+            var uploadImgIntervalDownward = "";
+            uploadImgIntervalDownward = setInterval(uploadImgDownward, 500);
+
+            // Set a generic timeout so user can proceed to the next pose even if they experience issues in this head pose.
+            setTimeout(() => {
+                clearInterval(uploadImgIntervalDownward);
+
+                setTimeout(() => {
+                    CleanAlert();
+                    $("#divStep3").slideDown(500);
+                    $(".customloader").hide();
+                    $("#waitImgUpload").hide();
+                    $("#btnStartRecordingDownward").prop('disabled', true);
+                    $("#btnStartRecordingDownward").removeClass('btn-primary');
+                    $("#btnStartRecordingDownward").addClass('btn-success');
+                    $("#divStep3").slideUp(500);
+                    $("#divStep4").slideDown(500);
+                    $("#liStep3").removeClass("bg-light");
+                    $("#liStep3").children("*").css("color", "#006400");
+                    $("#liStep3").children().last().html("OK");
+                    $("#divHeadingStep3").css("color", "#006400");
+                    $("#divSmallStep3").css("color", "#006400");
+
+                    video.src = 'enroll-img/thumb.png';
+
+                    //A video's MediaStream object is available through its srcObject attribute
+                    const mediaStream = video.srcObject;
+
+                    // Through the MediaStream, you can get the MediaStreamTracks with getTracks():
+                    const tracks = mediaStream.getTracks();
+
+                    // Stop all tracks:
+                    tracks.forEach(track => track.stop());
+                    document.getElementById("lblCameraStatus").innerHTML = "A sua câmara está DESLIGADA";
+
+                    return false;
+                }, 35000);
+
+            }, 30000);
+
+            $("#btnStartRecordingDownward").prop('disabled', true);
+
+            $(".customloader").show();
+            $("#waitImgUpload").show();
+
+
+            function uploadImgDownward() {
+                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                let image_data_url = canvas.toDataURL();
+                const base64Canvas = image_data_url.split(';base64,')[1];
+
+                var currentPose = "DOWNWARD_FACING";
+
+                fetch("save_img.php", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                  },
+                  body: `img_data=${base64Canvas}&email=${oEmail}&poseType=${currentPose}`,
+                })
+                .then(response => response.text())
+                .then(function(data) {
+                  var result = JSON.parse(data);
+
+                  if (result.code === 200 && result.msg === "OK") {
+                    counterDownwardPose = counterDownwardPose + 1;
+                  }
+
+                  if (counterDownwardPose >= 10) {
+
+                    if (stopShowDownward === false) {
+                        stopShowDownward = true;
+                        clearInterval(uploadImgIntervalDownward);
+                    }
+                  }
+
+                })
+                .catch((error) => {
+                  AlertMessage(4, "A captura das imagens falhou. Por favor, refresque a página e tente repetir o processo novamente.");
+                  return false;
+                });
+            }
+
+        });
+
+
+        var DisableButton = function (oButton) {
+          oButton.prop("disabled", true);
+          oButton.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> A processar...');
+        }
+
+        var EnableButton = function (oButton, oButtonText) {
+          oButton.prop("disabled", false);
+          oButton.html(oButtonText);
+        }
+
+        var AlertMessage = function (oAlertType, oAlertMessage) {
+          $("#lblAlert").removeClass("alert-primary").removeClass("alert-success").removeClass("alert-warning").removeClass("alert-danger");
+          switch(oAlertType){
+            case 1:
+              $("#lblAlert").addClass("alert-primary");
+              break;
+            case 2:
+              $("#lblAlert").addClass("alert-success");
+              break;
+            case 3:
+              $("#lblAlert").addClass("alert-warning");
+              break;
+            case 4:
+              $("#lblAlert").addClass("alert-danger");
+              break;
+          }
+          $("#lblAlert").html(oAlertMessage);
+          $("#lblAlert").slideDown(500);
+        }
+
+        var CleanAlert = function () {
+          $("#lblAlert").slideUp(500);
+          $("#lblAlert").removeClass("alert-primary").removeClass("alert-success").removeClass("alert-warning").removeClass("alert-danger");
+          $("#lblAlert").html("");
+        }
+
+
+      var canvas = document.getElementById('canvas');
+      var context = canvas.getContext('2d');
+      var video = document.getElementById('video');
+
+
+      $(document).on('change', '#ListOfCameras', function(){
+        CleanAlert();
+        $("#btnStartCamera").prop('disabled', false);
+
+        if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            var cameraID = $('#ListOfCameras').find(":selected").val();
+
+            if (cameraID === "-1") {
+              $("#btnCompleteStep2").css("display", "none");
+              $("#btnStartCamera").prop('disabled', true);
+              $("#btnStopCamera").prop('disabled', true);
+
+              video.src = 'enroll-img/thumb.png';
+
+              // A video's MediaStream object is available through its srcObject attribute
+              const mediaStream = video.srcObject;
+
+              // Through the MediaStream, you can get the MediaStreamTracks with getTracks():
+              const tracks = mediaStream.getTracks();
+
+              // Tracks are returned as an array, so if you know you only have one, you can stop it with:
+              // tracks[0].stop();
+
+              // Or stop all like so:
+              tracks.forEach(track => track.stop());
+              document.getElementById("lblCameraStatus").innerHTML = "A sua câmara está DESLIGADA";
+            }
+            else {
+              (async () => {
+                  await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: cameraID }, width: { exact: 640 }, height: { exact: 480 } } }).then(function(stream) {
+                    video.srcObject = stream;
+                    video.play();
+                    document.getElementById("lblCameraStatus").innerHTML = "A sua câmara está LIGADA";
+                    $("#btnCompleteStep2").css("display", "block");
+                    $("#btnStartCamera").prop('disabled', true);
+                    $("#btnStopCamera").prop('disabled', false);
+                  })
+              })();
+            }
+        }
+      });
+
+      document.getElementById("btnGetCameras").addEventListener("click", function() {
+
+        if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            (async () => {
+                await navigator.mediaDevices.getUserMedia({ video: { width: { exact: 640 }, height: { exact: 480 } } }).then(function(stream) {
+
+                })
+                let devices = await navigator.mediaDevices.enumerateDevices();
+                // $('#ListOfCameras').find('option').remove();
+
+                var i = 0;
+                for (i=0; i<devices.length; i++) {
+                  if (devices[i].kind === "videoinput") {
+                    $('#ListOfCameras').append('<option value="'+ devices[i].deviceId +'">'+ devices[i].label+'</option>');
+                  }
+                }
+                $("#btnGetCameras").prop('disabled', true);
+                AlertMessage(2, "Lista de câmaras disponíveis atualizada. Por favor selecione uma câmara da lista.");
+            })();
+        }
+      });
+
+
+      document.getElementById("btnStartCamera").addEventListener("click", function() {
+        var cameraID = $('#ListOfCameras').find(":selected").val();
+
+        if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            (async () => {
+                await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: cameraID}, width: { exact: 640 }, height: { exact: 480 } } }).then(function(stream) {
+                  video.srcObject = stream;
+                  video.play();
+                  document.getElementById("lblCameraStatus").innerHTML = "A sua câmara está LIGADA";
+                  $("#btnCompleteStep2").css("display", "block");
+                  $("#btnStartCamera").prop('disabled', true);
+                  $("#btnStopCamera").prop('disabled', false);
+                })
+            })();
+        }
+      });
+
+      document.getElementById("btnStopCamera").addEventListener("click", function() {
+        $("#btnCompleteStep2").css("display", "none");
+        $("#btnStopCamera").prop('disabled', true);
+        $("#btnStartCamera").prop('disabled', false);
+        video.src = 'enroll-img/thumb.png';
+
+        // A video's MediaStream object is available through its srcObject attribute
+        const mediaStream = video.srcObject;
+
+        // Through the MediaStream, you can get the MediaStreamTracks with getTracks():
+        const tracks = mediaStream.getTracks();
+
+        // Tracks are returned as an array, so if you know you only have one, you can stop it with:
+        // tracks[0].stop();
+
+        // Or stop all like so:
+        tracks.forEach(track => track.stop());
+        document.getElementById("lblCameraStatus").innerHTML = "A sua câmara está DESLIGADA";
+      });
+
+      // document.getElementById("snap").addEventListener("click", function() {
+      //   context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      // });
+    });
+    </script>
+  </body>
+</html>
