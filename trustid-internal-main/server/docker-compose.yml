@@ -1,0 +1,73 @@
+version: '3'
+
+volumes:
+  trustid-db-data:
+
+networks:
+  web:
+    external: true
+
+services:
+  trustid-postgres:
+    image: postgres
+    restart: always
+    volumes:
+      - trustid-db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    networks:
+      - web
+  trustid-server:
+    build: .
+    command: bash -c "python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py collectstatic --no-input && python3 manage.py runserver 0.0.0.0:10000"
+    container_name: trustid-server
+    env_file:
+      - ./django_variables.env
+    volumes:
+      - .:/code
+      - ./static/:/static
+      - ./media/:/media
+      - ./config/nginx/certs/:/etc/certs
+      - ./staticfiles/:/code/staticfiles
+      - ./models/:/code/models
+      - ./uVGGFace/:/code/uVGGFace
+    ports:
+        - "10000:10000"
+    depends_on:
+      - trustid-postgres
+      - trustid-rabbit
+    stdin_open: true
+    tty: true
+    networks:
+      - web
+  trustid-rabbit:
+    image: "rabbitmq:3-management"
+    hostname: "trustid-rabbit"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: "rabbitmq"
+      RABBITMQ_DEFAULT_PASS: "rabbitmq"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "16672:15672"
+      - "6672:5672"
+    labels:
+      NAME: "trustid-rabbit"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - web
+  trustid-celery:
+    build: .
+    env_file:
+      - ./django_variables.env
+    working_dir: /code
+    command:  ./init_celery.sh
+    links:
+      - trustid-rabbit
+    volumes:
+      - .:/code
+    ports:
+      - "6555:5555"
+    networks:
+      - web
